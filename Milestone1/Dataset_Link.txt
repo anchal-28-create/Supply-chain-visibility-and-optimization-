@@ -1,1 +1,9 @@
+Dataset Name: DataCo Smart Supply Chain for Big Data Analysis
 
+Source: Kaggle
+Dataset Link:
+https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
+
+Note:
+CSV file is not uploaded because of large file size.
+Dataset can be downloaded using the above Kaggle link.
