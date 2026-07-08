@@ -42,6 +42,11 @@ Basic preprocessing and transformation steps performed:
 ## Data Modelling
 
 The data model was created by separating transactional data into a Fact table and descriptive data into Dimension tables.
+### Star Schema Overview
+
+A Star Schema is a data modelling technique used in data warehousing to organize data for faster querying and easier reporting.
+
+In this project, the transactional data was stored in a central **Fact_table**, while descriptive information was separated into multiple **Dimension tables** such as Customer, Product, Category, Department, Shipping, Location, and Date.
 
 
 ## Fact Table Created
@@ -205,7 +210,7 @@ The final structure follows a Star/Snowflake schema approach for optimized suppl
 - Power BI Desktop
 - Power Query Editor
 - DAX
-- GitHub
+
 
 
 
