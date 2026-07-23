@@ -1,1 +1,617 @@
+# Supply Chain Visibility & Optimization – Milestone 2
 
+## Project Overview
+
+Milestone 2 focuses on developing interactive Power BI dashboards to analyze inventory and delivery performance using the DataCo Supply Chain dataset. The dashboards provide actionable insights into stock management, order fulfillment, and logistics performance, enabling data-driven decision-making.
+
+---
+
+## Objectives
+
+- Develop an Inventory Analytics Dashboard.
+- Develop a Delivery Performance Dashboard.
+- Track key inventory and delivery KPIs.
+- Perform warehouse, regional, and category-level analysis.
+- Create interactive dashboards using Power BI and DAX.
+
+---
+
+## Tools & Technologies
+
+- Microsoft Power BI
+- DAX (Data Analysis Expressions)
+
+---
+
+## Dashboard 1: Inventory Analytics
+
+# DAX Measures & Calculated Columns
+
+## Average Inventory Value
+
+```DAX
+Avg Inventory Value =
+AVERAGE(Fact_table[inventory_value])
+```
+
+---
+
+## Inventory Turnover Ratio (Sales)
+
+```DAX
+Inventory Turnover Ratio =
+DIVIDE([Total Sales], [Avg Inventory Value], 0)
+```
+
+---
+
+## Units Sold
+
+```DAX
+Units Sold =
+SUM(Fact_table[order_item_quantity])
+```
+
+---
+
+## Inventory Turnover Ratio (Units)
+
+```DAX
+Inventory Turnover Ratio (Units) =
+DIVIDE(
+    [Units Sold],
+    AVERAGE(Fact_table[stock_qty]),
+    0
+)
+```
+
+---
+
+## Turnover Rank
+
+```DAX
+Turnover Rank =
+RANKX(
+    ALL(Fact_table[category_name]),
+    [Inventory Turnover Ratio],
+    ,
+    DESC
+)
+```
+
+---
+
+## Max Order Date
+
+```DAX
+Max Order Date =
+CALCULATE(
+    MAX(Fact_table[order_date_(dateorders)]),
+    ALL(Fact_table)
+)
+```
+
+---
+
+## Days Since Last Sale (Measure)
+
+```DAX
+Days Since Last Sale =
+VAR LastSale =
+    CALCULATE(
+        MAX(Fact_table[order_date_(dateorders)]),
+        ALLEXCEPT(Fact_table, Fact_table[product_name])
+    )
+
+RETURN
+DATEDIFF(
+    LastSale,
+    [Max Order Date],
+    DAY
+)
+```
+
+---
+
+# Calculated Columns
+
+## Stock Status
+
+```DAX
+Stock Status =
+VAR DaysIdle = Fact_table[Days Since Last Sale (Col)]
+VAR Qty = Fact_table[stock_qty]
+
+RETURN
+SWITCH(
+    TRUE(),
+    Qty = 0, "Out of Stock",
+    DaysIdle > 90 && Qty > 0, "Dead Stock",
+    DaysIdle > 30 && DaysIdle <= 90, "Slow-Moving",
+    "Active"
+)
+```
+
+---
+
+## Days Since Last Sale (Column)
+
+```DAX
+Days Since Last Sale (Col) =
+VAR LastSale =
+    CALCULATE(
+        MAX(Fact_table[order_date_(dateorders)]),
+        ALLEXCEPT(Fact_table, Fact_table[product_name])
+    )
+
+VAR MaxDate =
+    CALCULATE(
+        MAX(Fact_table[order_date_(dateorders)]),
+        ALL(Fact_table)
+    )
+
+RETURN
+DATEDIFF(
+    LastSale,
+    MaxDate,
+    DAY
+)
+```
+
+---
+
+# Inventory KPIs
+
+## Dead Stock Count
+
+```DAX
+Dead Stock Count =
+CALCULATE(
+    DISTINCTCOUNT(Fact_table[product_name]),
+    Fact_table[Stock Status] = "Dead Stock"
+)
+```
+
+---
+
+## Dead Stock Quantity
+
+```DAX
+Dead Stock Quantity =
+CALCULATE(
+    SUM(Fact_table[Stock Qty]),
+    Fact_table[Stock Status] = "Dead Stock"
+)
+```
+
+---
+
+## Slow Moving Quantity
+
+```DAX
+Slow Moving Quantity =
+CALCULATE(
+    SUM(Fact_table[Stock Qty]),
+    Fact_table[Stock Status] = "Slow-Moving"
+)
+```
+
+---
+
+## Total Inventory Value
+
+```DAX
+Total Inventory Value =
+SUM(Fact_table[inventory_value])
+```
+
+---
+
+## Total Stock Quantity
+
+```DAX
+Total Stock Qty =
+SUM(Fact_table[stock_qty])
+```
+
+---
+
+## Category Sales Contribution %
+
+```DAX
+Category Sales Contribution % =
+DIVIDE(
+    [Total Sales],
+    CALCULATE(
+        [Total Sales],
+        ALL(Fact_table[category_name])
+    ),
+    0
+)
+```
+
+---
+
+## Average Order Item Profit Ratio
+
+```DAX
+Avg Order Item Profit Ratio =
+AVERAGE(Fact_table[order_item_profit_ratio])
+```
+
+---
+
+## Last Sale Date
+
+```DAX
+Last Sale Date =
+CALCULATE(
+    MAX(Fact_table[order_date_(dateorders)]),
+    ALLEXCEPT(Fact_table, Fact_table[product_name])
+)
+```
+
+---
+
+## Dead Stock Value
+
+```DAX
+Dead Stock Value =
+CALCULATE(
+    [Total Inventory Value],
+    FILTER(
+        Fact_table,
+        [Stock Status] = "Dead Stock"
+    )
+)
+```
+
+---
+
+## Month-over-Month Inventory Value Change
+
+```DAX
+MoM Inventory Value Change =
+VAR CurrentMonth = [Total Inventory Value]
+
+VAR PrevMonth =
+    CALCULATE(
+        [Total Inventory Value],
+        DATEADD(
+            Fact_table[order_date_(dateorders)],
+            -1,
+            MONTH
+        )
+    )
+
+RETURN
+DIVIDE(
+    CurrentMonth - PrevMonth,
+    PrevMonth,
+    0
+)
+```
+
+---
+
+## Inventory Value Trend (Regional)
+
+```DAX
+Inventory Value Trend (Regional) =
+CALCULATE(
+    [Total Inventory Value],
+    ALLEXCEPT(
+        Fact_table,
+        Fact_table[Region],
+        Fact_table[order_date_(dateorders)]
+    )
+)
+```
+
+---
+
+## Warehouse Capacity Used %
+
+```DAX
+Warehouse Capacity Used % =
+DIVIDE(
+    SUM(Fact_table[stock_qty]),
+    SUM(Fact_table[capacity]),
+    0
+)
+```
+
+---
+
+## Reorder Flag
+
+```DAX
+Reorder Flag =
+VAR Qty =
+    SUM(Fact_table[stock_qty])
+
+VAR ReorderLvl =
+    AVERAGE(Fact_table[reorder_level])
+
+VAR SafetyLvl =
+    AVERAGE(Fact_table[safety_stock])
+
+RETURN
+SWITCH(
+    TRUE(),
+    Qty <= SafetyLvl, "Critical - Below Safety Stock",
+    Qty <= ReorderLvl, "Reorder Now",
+    "OK"
+)
+```
+
+---
+
+## Products to Reorder
+
+```DAX
+Products to Reorder =
+CALCULATE(
+    DISTINCTCOUNT(Fact_table[product_name]),
+    FILTER(
+        Fact_table,
+        [Reorder Flag] = "Reorder Now"
+    )
+)
+```
+
+---
+
+
+
+### Key KPIs
+
+- Total Quantity Sold
+- Fast Moving Products
+- Slow Moving Products
+- Products Below Safety Stock
+- Active Products
+- Dead Stock
+- Out of Stock Products
+
+---
+
+## Dashboard 2: Delivery Performance
+
+# Delivery Performance DAX Measures
+
+## Total Orders
+
+```DAX
+Total Orders =
+DISTINCTCOUNT(Fact_table[order_id])
+```
+
+---
+
+## Late Delivery %
+
+```DAX
+Late Delivery % =
+DIVIDE(
+    CALCULATE(
+        DISTINCTCOUNT(Fact_table[order_id]),
+        Fact_table[delivery_status] = "Late delivery"
+    ),
+    [Total Orders],
+    0
+)
+```
+
+---
+
+## On Time Delivery %
+
+```DAX
+On Time Delivery % =
+DIVIDE(
+    CALCULATE(
+        DISTINCTCOUNT(Fact_table[order_id]),
+        Fact_table[delivery_status] = "Shipping on time"
+    ),
+    [Total Orders],
+    0
+)
+```
+
+---
+
+## Advance Shipping %
+
+```DAX
+Advance Shipping % =
+DIVIDE(
+    CALCULATE(
+        DISTINCTCOUNT(Fact_table[order_id]),
+        Fact_table[delivery_status] = "Advance shipping"
+    ),
+    [Total Orders],
+    0
+)
+```
+
+---
+
+## Lead Time Variance (Days)
+
+```DAX
+Lead Time Variance (Days) =
+[Avg Days for Shipping (Real)] -
+[Avg Days for Shipment (Scheduled)]
+```
+
+---
+
+## Regional Late Rate
+
+```DAX
+Regional Late Rate =
+CALCULATE(
+    [Late Delivery %],
+    ALLEXCEPT(
+        Fact_table,
+        Fact_table[order_region]
+    )
+)
+```
+
+---
+
+## Canceled Orders
+
+```DAX
+Canceled Orders =
+CALCULATE(
+    DISTINCTCOUNT(Fact_table[order_id]),
+    Fact_table[delivery_status] = "Shipping canceled"
+)
+```
+
+---
+
+## Fulfillment Rate
+
+```DAX
+Fulfillment Rate =
+DIVIDE(
+    [Total Orders] - [Canceled Orders],
+    [Total Orders],
+    0
+)
+```
+
+---
+
+## Late Delivery % Trend
+
+```DAX
+Late Delivery % Trend =
+CALCULATE(
+    [Late Delivery %],
+    ALLEXCEPT(
+        Fact_table,
+        Fact_table[order_date_(dateorders)]
+    )
+)
+```
+
+---
+
+## Total Risk Flagged Orders
+
+```DAX
+Total Risk Flagged Orders =
+CALCULATE(
+    DISTINCTCOUNT(Fact_table[order_id]),
+    Fact_table[Late_delivery_risk] = 1
+)
+```
+
+---
+
+## Late Delivery Risk %
+
+```DAX
+Late Delivery Risk % =
+DIVIDE(
+    [Total Risk Flagged Orders],
+    [Total Orders],
+    0
+)
+```
+
+---
+
+## Risk vs Actual Accuracy
+
+```DAX
+Risk vs Actual Accuracy =
+VAR RiskAndLate =
+    CALCULATE(
+        DISTINCTCOUNT(Fact_table[order_id]),
+        Fact_table[Late_delivery_risk] = 1,
+        Fact_table[delivery_status] = "Late delivery"
+    )
+
+RETURN
+DIVIDE(
+    RiskAndLate,
+    [Total Risk Flagged Orders],
+    0
+)
+```
+
+### Key KPIs
+
+- Total Orders
+- On-Time Delivery %
+- Late Delivery %
+- Advance Shipping %
+- Fulfillment Rate
+- Canceled Orders
+- Lead Time Variance
+
+---
+
+## DAX Measures Implemented
+
+Some of the major DAX calculations used include:
+
+- Total Orders
+- Total Quantity Sold
+- Days Since Last Sale
+- Stock Status
+- Safety Stock
+- Fast Moving Products
+- Late Delivery %
+- On-Time Delivery %
+- Advance Shipping %
+- Regional Late Rate
+- Fulfillment Rate
+- Lead Time Variance
+
+---
+
+## Key Insights
+
+### Inventory Analytics
+
+- Identified fast-moving and slow-moving products.
+- Monitored stock availability and products below safety stock.
+- Compared inventory performance across warehouses, regions, and product categories.
+- Tracked inventory trends over time.
+
+### Delivery Performance
+
+- Evaluated delivery performance using on-time and late delivery metrics.
+- Compared shipping modes based on delivery outcomes.
+- Identified regions with higher late delivery rates.
+- Measured fulfillment efficiency and delivery lead time variance.
+
+---
+
+## Repository Structure
+
+```
+Milestone2
+│
+├── Supply_Chain_Milestone_2.pbix
+├── README.md
+└── Screenshots
+    ├── Inventory_Dashboard.png
+    ├── Delivery_Dashboard.png
+    └── Dashboard_Overview.png
+```
+
+---
+
+
+
+## Conclusion
+
+This milestone demonstrates the use of Power BI and DAX to transform raw supply chain data into meaningful business insights. The dashboards support inventory optimization, delivery monitoring, and operational decision-making through interactive visualizations and KPI tracking.
