@@ -576,42 +576,6 @@ Some of the major DAX calculations used include:
 - Lead Time Variance
 
 ---
-
-## Key Insights
-
-### Inventory Analytics
-
-- Identified fast-moving and slow-moving products.
-- Monitored stock availability and products below safety stock.
-- Compared inventory performance across warehouses, regions, and product categories.
-- Tracked inventory trends over time.
-
-### Delivery Performance
-
-- Evaluated delivery performance using on-time and late delivery metrics.
-- Compared shipping modes based on delivery outcomes.
-- Identified regions with higher late delivery rates.
-- Measured fulfillment efficiency and delivery lead time variance.
-
----
-
-## Repository Structure
-
-```
-Milestone2
-│
-├── Supply_Chain_Milestone_2.pbix
-├── README.md
-└── Screenshots
-    ├── Inventory_Dashboard.png
-    ├── Delivery_Dashboard.png
-    └── Dashboard_Overview.png
-```
-
----
-
-
-
 ## Conclusion
 
 This milestone demonstrates the use of Power BI and DAX to transform raw supply chain data into meaningful business insights. The dashboards support inventory optimization, delivery monitoring, and operational decision-making through interactive visualizations and KPI tracking.
