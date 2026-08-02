@@ -113,33 +113,6 @@ Ranks suppliers based on the Supplier Composite Score.
 
 ---
 
-# Supplier Scorecard Calculation Methodology
-
-Each supplier is evaluated using a weighted composite score.
-
-| Performance Metric | Weight |
-|--------------------|--------|
-| Quality Score | 40% |
-| Reliability % | 40% |
-| Lead Time | 20% |
-
-The Supplier Composite Score is used to compare supplier performance and benchmark suppliers across the organization.
-
----
-
-# Supplier Ranking & Benchmarking Approach
-
-Suppliers are classified according to Reliability Tier:
-
-| Reliability % | Tier |
-|---------------|------|
-| 80% and above | High |
-| 50% – 79% | Medium |
-| Below 50% | Low |
-
-Supplier Rank is calculated using the Supplier Composite Score, helping identify the best-performing suppliers and those requiring improvement.
-
----
 
 ## Dashboard Visualizations
 
@@ -221,11 +194,6 @@ DIVIDE (
 )
 ```
 
-Calculates the percentage of orders delivered through Same Day shipping.
-
----
-
-# Transportation Cost Analysis Methodology
 
 The dashboard analyzes logistics performance by monitoring:
 
@@ -239,17 +207,6 @@ These metrics help evaluate operational performance and optimize transportation 
 
 ---
 
-# Route & Carrier Performance Evaluation
-
-The Transportation Dashboard helps compare:
-
-- Shipping performance
-- Transportation efficiency
-- Profitability
-- Discount trends
-- Same Day delivery share
-
-These insights help businesses optimize logistics operations and improve customer service.
 
 ---
 
@@ -305,7 +262,7 @@ These insights help businesses optimize logistics operations and improve custome
 - Power Query
 - Data Modeling
 
--
+
 ---
 
 # Conclusion
