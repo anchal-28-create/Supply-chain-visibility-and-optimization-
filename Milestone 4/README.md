@@ -1,4 +1,4 @@
-# Supply Chain Visibility & Optimization Dashboard
+# Supply Chain Visibility & Optimization 
 
 ## Project Overview
 
